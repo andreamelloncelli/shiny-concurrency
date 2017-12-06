@@ -1,6 +1,6 @@
-install.packages('devtools')
+#install.packages('devtools')
 
-devtools::install_github("rstudio/shinyloadtest")
+#devtools::install_github("rstudio/shinyloadtest")
 
 # install.packages("purrr")
 # install.packages("ggplot2")
@@ -10,7 +10,7 @@ library(rlang)
 library(purrr)
 library(ggplot2)
 library(httr)
-install.packages('progress')
+#install.packages('progress')
 library(progress)
 library(rsconnect)
 library(shinyloadtest)
@@ -51,6 +51,7 @@ report_gen <- function(sim) {
   report_template_name = "report.Rmd"
   report_tmp = file.path(report_path, "report.html")
   createLoadTestReport(dir = report_path, name = report_template_name)
+  report_template <- file.path(report_path, report_template_name)
   directory   = sim$outdir #'~/shiny-concurrency/shiny-server-pro/4_json/output_10_mysql_001usr_4thr_100-090-40_2min_net/'
   output = strsplit(directory, split = "/")[[1]][5]
   report_file = file.path( report_path, paste0('report_', output, '.html') )
@@ -85,10 +86,28 @@ sim_param_2 %>%
   report_gen
 
 
-sim_result <-   list(poll       = NA,
-                     outdir     = "~/shiny-concurrency/shiny-server-pro/4_json/output_10_mysql_001usr_4thr_100-090-40_2min_net/",
-                     parameters = NA,
-                     command    = NA)
-report_gen(sim_result)
+
 unlink('~/shiny-concurrency/shiny-server-pro/4_json/output_canc//profile_173_2.txt')
 
+# reports -----------------------------------------------------------------
+
+list(poll       = NA,
+     outdir     = "~/shiny-concurrency/shiny-server-pro/4_json/output_10_mysql_001usr_4thr_100-090-40_2min_net/",
+     parameters = NA,
+     command    = NA) %>%
+  report_gen
+list(poll       = NA,
+     outdir     = "~/shiny-concurrency/shiny-server-pro/4_json/output_11_mysql_200usr_4thr_100-090-40_2min_net/",
+     parameters = NA,
+     command    = NA) %>%
+  report_gen
+list(poll       = NA,
+     outdir     = "~/shiny-concurrency/shiny-server-pro/4_json/output_54_mysql_200usr_4thr_100-090-40_6min_vb/",
+     parameters = NA,
+     command    = NA) %>%
+  report_gen
+list(poll       = NA,
+     outdir     = "~/shiny-concurrency/shiny-server-pro/4_json/output_52_mysql_001usr_4thr_100-090-40_2min_vb/",
+     parameters = NA,
+     command    = NA) %>%
+  report_gen
