@@ -23,7 +23,13 @@ log <- createLog(params$directory)
 
 ## Results
 
-The load test was started at `r min(log$time)` and ended at `r max(log$time)`. There were `r length(unique(log$connection))` successful connections. A maximum `r getMaxConcurrent(log)` concurrent connections were achieved.
+Il test è partito alle `r min(log$time)` ed è terminato alle `r max(log$time)`. 
+
+Connessioni effettuate con successo: `r length(unique(log$connection))`. 
+
+Massiomo di sessioni concorrenti `r getMaxConcurrent(log)` raggiunte.
+
+Questo plot presenta il numero di sessioni attive al variare del tempo del test:
 
 ```{r concurrent_over_time}
 con <- getConcurrentOverTest(log)
@@ -38,6 +44,8 @@ ggplot(con, aes(time, connections)) +
 ```
 
 ## Page load time
+
+Questo boxplot presenta la distribuzione dei tempi di caricamento della pagina dopo l'apertura del browser all'indirizzo dell'applicazione.
 
 ```{r}
 load <- getPageLoadTimes(log) 
@@ -54,9 +62,10 @@ ggplot(load, aes(1, load_time_sec)) +
   guides(shape = FALSE)
 ```
 
-The average page load time under load was `r mean(load$load_time_sec)` seconds.
+Tempo medio di caricamento: `r mean(load$load_time_sec)` secondi.
 
-The following graph shows the response time for specific events taken after page load.
+
+Questo plot invece presenta le distribuzioni dei tempi di risposta per ognuno dei tre click (interazione utente).
 
 ```{r}
 load <- getSetInputTimes(log)
