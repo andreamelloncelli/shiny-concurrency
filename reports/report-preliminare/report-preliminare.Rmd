@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 L'infrastruttura è composta da 4 macchine:
 
-* 1 AWS server MySQL ()
+* 1 AWS server MySQL
 * 1 AWS server con Shiny Server Pro
 * 1 AWS server con RStudio che lancia le richeste simulate
 * 1 virtual-machine locale che lancia le richieste simulate dal di fuori della rete AWS
@@ -57,9 +57,13 @@ La fase di test (2.) è pensata per tenere il server con il numero massimo di se
 Nel nostro caso la sessione dura circa 45 secondi. Ogni sessione viene ripetuta un numero di volte sufficente a tenere il server impegnato con le `n` connessioni per la `duration` stabilita (varia a seconda dei test).
 
 La registrazione è cosi' composta:
+
 1. caricamento della pagina. Da fine caricamento una pausa di 15 secondi per guardare il risultato.
+
 2. primo click sul widget delle date.
+
 3. secondo click su un'altra data (questo causa il lancio della query sul db e la visualizzazione dei risultati)
+
 4. terzo clicx su un'altra data (stesso effetto di ricalcolo) (NB: senza pausa)
 
 Riassumiamo. 4 tempi: il caricamento della pagina e tre di interazione con l'utente.
@@ -124,11 +128,32 @@ le parti degne di nota sono:
 
 `report_output_<id>_mysql_<number-concurrent-users>usr_4thr_100-090-40_<duration>min_<test-machine>`
 
-1. id: è un semplice id numerico che mi serve in fase di generazione
+1. id: è un semplice id numerico unico del test
 2. number-concurrent-users: numero di utenti concorrenti richiesti
 3. duration: vedi sopra
 4. test-machine: è la macchina di test. Due possibilità `net` il server AWS oppure `vb` la mia virtualbox-machine (su rete 4G)
 
-## Commento ai test
+## Risultati preliminari
+
+### Importanza della banda
+
+Ho allegato sia i test fatti in rete locale che quelli da rete 4G, perche' ritengo che in questo test la rete sia un collo di bottiglia non indifferente. Si pensi che in un test da 6 minuti con 200 utenti concorrenti sono stati scambiati circa 600 Mb in modo tuttaltro che uniforme (molto impulsivo). Penso che questo sia determinato dal fatto che al caricamento della pagina la simulazione scarichi tutte le librerie Javascript, e le 200 richieste iniziali partono quasi contemporaneamente.
+
+### Test da macchina remota Virtualbox
+
+Il [test 52](./report_output_52_mysql_001usr_4thr_100-090-40_2min_vb.html) rappresenta l'utilizzo reale di prova in fase di sviluppo: 1 solo utente e i tempi di latenza reali perchè la macchina è remota.
+
+Il [test 54](./report_output_54_mysql_200usr_4thr_100-090-40_6min_vb.html) è quello che potrebbe essere considerato più completo: 200 utenti e tempi di latenza realistici. Invece sembra fortemente influenzato dalla banda: Utilizzando 2 connessioni diverse(testato senza la creazione di un report) i risultati dei test cambiano sensibilmente. Questo non può essere dovuto quindi ad altro.
+
+### Test da macchina locale in rete AWS
+
+Il [test 10](./report_output_10_mysql_001usr_4thr_100-090-40_2min_net.html) invece è quello che si ottiene con un solo utente in rete locale AWS (molto veloce ~ 100 Mb/s e a bassa latena). I tempi si abbassano molto: sembra che i tempi siano dovuti quasi interamente alla latenza di rete. A riprova di questo si puo' dire che durante i test la macchina non arriva al 100% dell'utilizzo delle cpu.
+
+Il [test 11](./report_output_11_mysql_200usr_4thr_100-090-40_2min_net.html) è infine il test con la concorrenza voluta, ma con una bassissima latenza di rete.
+
+### Altre verifiche fatte
+
+L'applicazione scrive un file di log, che differenzia la fase di inizializzazione dalla fase di query (click dell'utente). Durante i test è stato verificato che questi log venissero scritti e si è anche evidenziata la differenza tra la fase di inizializzazione della pagina e quella di semplice lancio della query. Durante l'inizializzazione infatti viene lanciata sia l'inizializzazione che la query, in fase di click solo la query.
+
 
 

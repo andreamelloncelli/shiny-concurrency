@@ -26,7 +26,7 @@ simulate <- function(p) {
                     "mkdir -p ", outdir, "; ",
                     "~/shiny-concurrency/proxyrec playback ",
                     "--target 'http://ec2-52-201-221-45.compute-1.amazonaws.com:3838/", p$app, "/' ",
-                    "--outdir ", outdir, 
+                    "--outdir ", outdir,
                     " --concurrency ", p$concurrency, "  --duration '", p$duration, "' ",
                     "../../tests/4_json/app-recording.txt &")
   message("running: ", command)
@@ -50,13 +50,13 @@ report_gen <- function(sim) {
   report_path = '~/shiny-concurrency/reports/shiny-server-pro'
   report_template_name = "report.Rmd"
   report_tmp = file.path(report_path, "report.html")
-  createLoadTestReport(dir = report_path, name = report_template_name)
+  #createLoadTestReport(dir = report_path, name = report_template_name)
   report_template <- file.path(report_path, report_template_name)
   directory   = sim$outdir #'~/shiny-concurrency/shiny-server-pro/4_json/output_10_mysql_001usr_4thr_100-090-40_2min_net/'
   output = strsplit(directory, split = "/")[[1]][5]
   report_file = file.path( report_path, paste0('report_', output, '.html') )
-  
-  rmarkdown::render(report_template, 
+
+  rmarkdown::render(report_template,
                     params = list(directory = directory))
   file.rename(report_tmp, report_file)
 }
@@ -78,7 +78,7 @@ sim_param_2 <- list(id = "31",
 
 sim_1_out <-
   sim_param_1 %>%
-  simulate 
+  simulate
 report_gen(sim_1_out)
 
 sim_param_2 %>%
@@ -91,11 +91,14 @@ unlink('~/shiny-concurrency/shiny-server-pro/4_json/output_canc//profile_173_2.t
 
 # reports -----------------------------------------------------------------
 
-list(poll       = NA,
+l = list(poll       = NA,
      outdir     = "~/shiny-concurrency/shiny-server-pro/4_json/output_10_mysql_001usr_4thr_100-090-40_2min_net/",
      parameters = NA,
-     command    = NA) %>%
-  report_gen
+     command    = NA)
+log <- createLog(l$outdir)
+
+report_gen(l)
+
 list(poll       = NA,
      outdir     = "~/shiny-concurrency/shiny-server-pro/4_json/output_11_mysql_200usr_4thr_100-090-40_2min_net/",
      parameters = NA,
@@ -111,3 +114,4 @@ list(poll       = NA,
      parameters = NA,
      command    = NA) %>%
   report_gen
+
