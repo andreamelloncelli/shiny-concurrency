@@ -73,35 +73,57 @@ SimOut(poll       = NA,
 
 # shiny-proxy -------------------------------------------------------------
 
-shiny_proxy <- "ec2-35-153-232-44.compute-1.amazonaws.com"
+shiny_proxy <- "ec2-35-153-83-243.compute-1.amazonaws.com"
+#shiny_proxy <- "172.30.3.104"
 frame <- '    <iframe id="shinyframe" width="100%" src="/elated_carson/"></iframe>'
 
-sim_param_3 <- SimulationProxy(id = "70",
+sim_param_3 <- SimulationProxy(id = "71",
                                app = "test_app",
                                concurrency = "1",
                                srv_conf = "100-090-40_net",
-                               duration = "60sec",
+                               duration = "2min",
                                time_monitor = 30,
                                shiny_server = shiny_proxy,
-                               shiny_port   = "8080")
+                               shiny_port   = "8080", 
+                               outpath = "~/shiny-concurrency/shiny-proxy/5_json",
+                               rectest      = "../../tests/5_json_SP/app-recording.txt")
+#containerLs <- map(containerStrings, Container, hash = NA,port = 8080)
+
+containerLsB_generate <- function(id) {
+  Container(name = ""
+            , hash = NA
+            , port = id +40000)
+}
+containerLsB <- purrr::map(1:150, containerLsB_generate)
 
 
-url <- paste0(app_url.SimulationProxy(sim_param_3), "/")
-url
-require(RCurl)
-
-r = dynCurlReader()
-str(r)
-r$reset()                               # reset
-curlPerform(
-  #postfields = json_1,
-            url = url,                  # or uri
-            verbose = TRUE,
-            # userpwd = usr_pwd,
-            # httpauth = 1L,
-            # post = 1L,
-            writefunction = r$update)   # append the result
-html <- shinyProxyPage
-html <- r$value()
-strsplit(html, split = "\n")[[1]][82]
-substr()
+simulationLs <- simulationLs_get.SimulationProxy(sim_param_3, containerLsB) 
+s <- shinyConcurrency::simulate
+simOutLs <- lapply(simulationLs, s)
+simOutLs
+system(command = "ps aux | grep proxyrec")
+simProxyOutLs <- SimProxyOutLs(simOutLs)
+listSimOutFiles.SimProxyOutLs(simProxyOutLs)[1:50]
+moveFiles.SimProxyOutLs(simProxyOutLs)
+simOut <- ToSimOut.SimProxyOutLs(simProxyOutLs)
+simOut
+report_gen(simOut)
+# url <- paste0(app_url.SimulationProxy(sim_param_3), "/")
+# url
+# require(RCurl)
+# 
+# r = dynCurlReader()
+# str(r)
+# r$reset()                               # reset
+# curlPerform(
+#   #postfields = json_1,
+#             url = url,                  # or uri
+#             verbose = TRUE,
+#             # userpwd = usr_pwd,
+#             # httpauth = 1L,
+#             # post = 1L,
+#             writefunction = r$update)   # append the result
+# html <- shinyProxyPage
+# html <- r$value()
+# strsplit(html, split = "\n")[[1]][82]
+# substr()
